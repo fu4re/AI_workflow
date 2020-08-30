@@ -1,18 +1,17 @@
-import os, csv
+import os
+import pandas as pd
 
 local_path = os.getcwd()
-source = "data\\student-mat.csv"
-#SEP = str(',')  # Для замены на другой разделитель
+source = "data\\student-por.csv"
+CHUNK_SIZE = 1000
 
 with open(local_path + "\\" + source) as R:
-    iterator = csv.reader(R, delimiter=',')
-    for n, row in enumerate(iterator):
-        if n == 0:
-            header = row
-        else:
-            # Кор алгоритма
-            pass
+    iterator = pd.read_csv(R, chunksize=CHUNK_SIZE)
 
-    print(f"Всего строк: {n + 1}")
-    print(f"Заголовок: {', '.join(header)}")
-    print(f"Примеры значений: {', '.join(row)}")
+    # Итератор определен, исходя из размера чанка, указанного в итераторе
+    for n, data_chunk in enumerate(iterator):
+        print("Размер загруженной порции данных: %i прецедентов, %i признаков" % data_chunk.shape)
+        # Кор алгоритма
+        pass
+
+    print(f"Примеры значений: \n{str(data_chunk.iloc[0])}")
