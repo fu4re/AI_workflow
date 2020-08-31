@@ -1,4 +1,4 @@
-import os, sys
+import os
 import sqlite3, csv, glob
 
 
@@ -9,9 +9,9 @@ def define_field(s):
     except ValueError:
         try:
             float(s)
-            return 'float'
+            return 'real'
         except:
-            return 'str'
+            return 'text'
 
 
 def create_sqlite_db(db='data\\database.sqlite', file_pattern=''):
@@ -28,7 +28,7 @@ def create_sqlite_db(db='data\\database.sqlite', file_pattern=''):
         tablename = os.path.splitext(os.path.basename(csvfile))[0]
 
         with open(csvfile) as f:
-            reader = csv.reader(f, delimiter=';')
+            reader = csv.reader(f, delimiter=',')
 
             f.seek(0)
             for n, row in enumerate(reader):
@@ -44,7 +44,7 @@ def create_sqlite_db(db='data\\database.sqlite', file_pattern=''):
                     # TODO: Пофиксить sql запросы (syntax-error)
                     sql = "DROP TABLE IF EXISTS %s" % tablename
                     c.execute(sql)
-                    sql = "CREATE TABLE %s (%s)" % (tablename, ';'.join(["%s, %s" % (col, ct) for col, ct in zip(row, types)]))
+                    sql = "CREATE TABLE %s (%s)" % (tablename, ', '.join(["%s %s" % (col, ct) for col, ct in zip(row, types)]))
                     print(f"({k + 1}) {sql}")
                     c.execute(sql)
 
@@ -54,7 +54,7 @@ def create_sqlite_db(db='data\\database.sqlite', file_pattern=''):
                             sql = "CREATE INDEX %s on %s (%s)" % (index, tablename, column)
                             c.execute(sql)
 
-                    insertsql = "INSERT INTO %s VALUES (%s)" % (tablename, ';'.join(["?" for column in row]))
+                    insertsql = "INSERT INTO %s VALUES (%s)" % (tablename, ', '.join(["?" for column in row]))
                     rowlen = len(row)
                 else:
                     # Ошибка, если строки с неправильным числом полей
